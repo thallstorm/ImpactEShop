@@ -20,11 +20,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 // Register services with dependency injection
-builder.Services.AddTransient<IProductsRepository, ProductsRepository>(); // Replace with your actual product service implementation
+builder.Services.AddTransient<IProductsRepository, ProductsRepository>(); 
 builder.Services.AddSingleton<IBasketRepository>(provider => new BasketRepository(
-	new ConcurrentDictionary<Guid, List<BasketItem>>(), // Replace with your basket storage implementation
+	new ConcurrentDictionary<Guid, List<BasketItem>>(), 
 	provider.GetRequiredService<IProductsRepository>()
 ));
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 var app = builder.Build();
 
