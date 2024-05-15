@@ -1,4 +1,5 @@
 ﻿using ImpactEShop.Models.Domain;
+using ImpactEShop.Models.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,15 @@ using System.Threading.Tasks;
 namespace ImpactEShop.Abstractions.Repositories;
 public interface IProductsRepository
 {
-    Task<Product> GetProductByIdAsync(Guid id);
-    Task<Product> GetProductsAsync(CancellationToken cancellationToken);
-    Task<Product> CreateProductAsync(ModifyProductInfo productInfo, CancellationToken cancellationToken);
-    Task<Product> UpdateProductAsync(Guid id, ModifyProductInfo productInfo, CancellationToken cancellationToken);
-    Task DeleteProductAsync(Guid id, CancellationToken cancellationToken);
+	Task GetProductsAsync(int page, int pageSize, string brandFilter, decimal? minPrice, decimal? maxPrice);
+	Task<Product> GetProductByIdAsync(Guid productId);
+	Task<List<Product>> GetProductsAsync();
+	Task<Product> CreateProductAsync(Product product);
+	Task UpdateProductAsync(Product product);
+	Task DeleteProductAsync(Guid productId);
+	Task<int> GetTotalProductCountAsync(ProductFilter filter);
+
+	/*Task<IEnumerable<object>> GetProductsAsync(int page, int pageSize);*/
 }
 
 public record ModifyProductInfo
