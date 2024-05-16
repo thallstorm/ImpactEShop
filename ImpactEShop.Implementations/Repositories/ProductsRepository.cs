@@ -53,7 +53,7 @@ public sealed class ProductsRepository : IProductsRepository
 		return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 	}*/
 
-	public async Task GetProductsAsync(int page, int pageSize,
+	/*public async Task GetPageProductsAsync(int page, int pageSize,
 		string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
 	{
 		var query = _dbContext.Products.AsQueryable();
@@ -74,13 +74,12 @@ public sealed class ProductsRepository : IProductsRepository
 		}
 
 		await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-	}
+	}*/
 
-	public async Task<Product> CreateProductAsync(Product product)
+	public async Task CreateProductAsync(Product product)
 	{
 		_dbContext.Products.Add(product);
 		await _dbContext.SaveChangesAsync();
-		return product;
 	}
 
 	public async Task UpdateProductAsync(Product product)

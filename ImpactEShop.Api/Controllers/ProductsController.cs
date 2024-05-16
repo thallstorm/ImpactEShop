@@ -44,7 +44,26 @@ namespace ImpactShopExample.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<ProductListResponseModel>> GetProductsAsync(int page = 1, int pageSize = 10,
+		public async Task<ActionResult<List<ProductDetailsResponseModel>>> GetProductsAsync()
+		{
+			var products = await _productsRepository.GetProductsAsync();
+			var responseModels = products.Select(product => new ProductDetailsResponseModel
+			{
+				Id = product.Id,
+				Name = product.Name,
+				Description = product.Description,
+				Price = product.Price,
+				Brand = product.Brand,
+				DiscountedPrice = product.DiscountedPrice,
+				Stock = product.Stock,
+				Status = product.Status
+			}).ToList();
+
+			return Ok(responseModels);
+		}
+
+		/*[HttpGet]
+		public async Task<ActionResult<ProductListResponseModel>> GetPageProductsAsync(int page = 1, int pageSize = 10,
 			string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
 		{
 			// Ensure valid page and page size (allow 6, 12, or all)
@@ -72,7 +91,7 @@ namespace ImpactShopExample.Controllers
 			};
 
 			// Retrieve product details for the current page using a separate repository call (optional)
-			/*var productDetails = await _productsRepository.GetProductsAsync(page, pageSize); // Optional
+			*//*var productDetails = await _productsRepository.GetProductsAsync(page, pageSize); // Optional
 
 			// Map product details to ProductSummaryResponseModel objects and add them to the response
 			foreach (var product in productDetails)
@@ -86,10 +105,10 @@ namespace ImpactShopExample.Controllers
 					//ImageUrl = Your logic to get the image URL for the product (optional)
 
 				});
-			}*/
+			}*//*
 
 			return Ok(responseModel);
-		}
+		}*/
 
 		[HttpPost]
 		public async Task<ActionResult<ProductDetailsResponseModel>> CreateProductAsync([FromBody] ProductCreateRequestModel requestModel)
@@ -112,22 +131,69 @@ namespace ImpactShopExample.Controllers
 				Status = requestModel.Status
 			};
 
-			var createdProduct = await _productsRepository.CreateProductAsync(product);
+			await _productsRepository.CreateProductAsync(product);
 
 			// Map created product data to response model
 			var responseModel = new ProductDetailsResponseModel
 			{
-				Id = createdProduct.Id,
-				Name = createdProduct.Name,
-				Description = createdProduct.Description,
-				Price = createdProduct.Price,
-				Brand = createdProduct.Brand,
-				DiscountedPrice = createdProduct.DiscountedPrice,
-				Stock = createdProduct.Stock,
-				Status = createdProduct.Status
+				Id = product.Id,
+				Name = product.Name,
+				Description = product.Description,
+				Price = product.Price,
+				Brand = product.Brand,
+				DiscountedPrice = product.DiscountedPrice,
+				Stock = product.Stock,
+				Status = product.Status
 			};
 
-			return CreatedAtRoute("GetProduct", new { productId = responseModel.Id }, responseModel);
+			return Ok(responseModel);
+		}
+
+		[HttpPut("{productId}")]
+
+		public async Task<ActionResult<ProductCreateRequestModel>> UpdateProductAsync(Guid productId, [FromBody] ProductCreateRequestModel requestModel)
+		{
+			if (requestModel == null)
+			{
+				return BadRequest("Request model cannot be null.");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			var product = await _productsRepository.GetProductByIdAsync(productId);
+			if (product == null)
+			{
+				return NotFound();
+			}
+
+			product.Id = requestModel.Id;
+			product.Name = requestModel.Name;
+			product.Description = requestModel.Description;
+			product.Price = requestModel.Price;
+			product.Brand = requestModel.Brand;
+			product.DiscountedPrice = requestModel.DiscountedPrice;
+			product.Stock = requestModel.Stock;
+			product.Status = requestModel.Status;
+
+			await _productsRepository.UpdateProductAsync(product);
+
+			var responseModel = new ProductDetailsResponseModel
+			{
+				Id = product.Id,
+				Name = product.Name,
+				Description = product.Description,
+				Price = product.Price,
+				Brand = product.Brand,
+				DiscountedPrice = product.DiscountedPrice,
+				Stock = product.Stock,
+				Status = product.Status
+			};
+
+			return Ok(responseModel);
+
 		}
 
 		// Implement UpdateProductAsync and DeleteProductAsync methods

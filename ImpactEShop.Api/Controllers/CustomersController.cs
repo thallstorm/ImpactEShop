@@ -100,6 +100,11 @@ namespace ImpactEShop.Api.Controllers
 		[HttpPut("{customerId}")]
 		public async Task<ActionResult<CustomerDetailsResponseModel>> UpdateCustomerAsync(Guid customerId, [FromBody] CustomerCreateRequestModel requestModel)
 		{
+			if (requestModel == null)
+			{
+				return BadRequest("Request model cannot be null.");
+			}
+
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
@@ -116,6 +121,7 @@ namespace ImpactEShop.Api.Controllers
 			customer.Email = requestModel.Email;
 			customer.PhoneNumber = requestModel.PhoneNumber;
 			customer.Address = requestModel.Address;
+			customer.PostalCode = requestModel.PostalCode;
 
 			await _customerRepository.UpdateCustomerAsync(customer);
 

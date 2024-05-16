@@ -30,7 +30,7 @@ namespace ImpactEShop.Implementations.Repositories
 			return await _dbContext.Products.ToListAsync();
 		}
 
-		public async Task GetProductsAsync(int page, int pageSize,
+		/*public async Task GetPageProductsAsync(int page, int pageSize,
 		string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
 		{
 			var query = _dbContext.Products.AsQueryable();
@@ -51,7 +51,7 @@ namespace ImpactEShop.Implementations.Repositories
 			}
 
 			await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-		}
+		}*/
 
 		public async Task CreateProductAsync(Product product)
 		{
@@ -80,7 +80,7 @@ namespace ImpactEShop.Implementations.Repositories
 			}
 		}
 
-		Task<Product> IProductsRepository.CreateProductAsync(Product product)
+		Task IProductsRepository.CreateProductAsync(Product product)
 		{
 			throw new NotImplementedException();
 		}

@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 namespace ImpactEShop.Abstractions.Repositories;
 public interface IProductsRepository
 {
-	Task GetProductsAsync(int page, int pageSize, string brandFilter, decimal? minPrice, decimal? maxPrice);
 	Task<Product> GetProductByIdAsync(Guid productId);
 	Task<List<Product>> GetProductsAsync();
-	Task<Product> CreateProductAsync(Product product);
+	Task CreateProductAsync(Product product);
 	Task UpdateProductAsync(Product product);
 	Task DeleteProductAsync(Guid productId);
 	Task<int> GetTotalProductCountAsync(ProductFilter filter);
+	/*Task GetPageProductsAsync(int page, int pageSize, string brandFilter, decimal? minPrice, decimal? maxPrice);*/
 
 	/*Task<IEnumerable<object>> GetProductsAsync(int page, int pageSize);*/
 }
