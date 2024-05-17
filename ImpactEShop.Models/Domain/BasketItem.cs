@@ -10,5 +10,9 @@ namespace ImpactEShop.Models.Domain
 	{
 		public Product Product { get; set; }
 		public int Quantity { get; set; }
+
+		public decimal Price => Product.Price * Quantity;
+
+
 	}
 }

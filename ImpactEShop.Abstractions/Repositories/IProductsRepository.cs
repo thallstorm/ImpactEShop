@@ -14,10 +14,10 @@ public interface IProductsRepository
 	Task CreateProductAsync(Product product);
 	Task UpdateProductAsync(Product product);
 	Task DeleteProductAsync(Guid productId);
-	Task<int> GetTotalProductCountAsync(ProductFilter filter);
-	/*Task GetPageProductsAsync(int page, int pageSize, string brandFilter, decimal? minPrice, decimal? maxPrice);*/
 
-	/*Task<IEnumerable<object>> GetProductsAsync(int page, int pageSize);*/
+	Task<int> GetTotalProductCountAsync(ProductFilter filter);
+	Task<List<Product>> GetPageProductsAsync(int page, int pageSize, ProductFilter filter); // Add filter parameter
+
 }
 
 public record ModifyProductInfo

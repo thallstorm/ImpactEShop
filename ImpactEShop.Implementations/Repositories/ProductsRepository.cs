@@ -21,7 +21,6 @@ public sealed class ProductsRepository : IProductsRepository
 
 	public async Task<Product> GetProductByIdAsync(Guid id)
     {
-		/*throw new NotImplementedException();*/
 		return await _dbContext.Products.FindAsync(id);
 	}
 
@@ -30,51 +29,42 @@ public sealed class ProductsRepository : IProductsRepository
 		return await _dbContext.Products.ToListAsync();
 	}
 
-	/*public async Task<List<Product>> GetProductsAsync(int page, int pageSize,
-		string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
+	private IQueryable<Product> ApplyFilters(IQueryable<Product> query, ProductFilter filter)
+    {
+        if (!string.IsNullOrEmpty(filter.Brand))
+        {
+            query = query.Where(p => p.Brand == filter.Brand);
+        }
+
+        if (filter.MinPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= filter.MinPrice.Value);
+        }
+
+        if (filter.MaxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= filter.MaxPrice.Value);
+        }
+
+        return query;
+    }
+	public async Task<int> GetTotalProductCountAsync(ProductFilter filter)
 	{
 		var query = _dbContext.Products.AsQueryable();
+		query = ApplyFilters(query, filter);
 
-		if (!string.IsNullOrEmpty(brandFilter))
-		{
-			query = query.Where(p => p.Brand.Contains(brandFilter));
-		}
+		return await query.CountAsync();
+	}
 
-		if (minPrice.HasValue)
-		{
-			query = query.Where(p => p.Price >= minPrice.Value);
-		}
-
-		if (maxPrice.HasValue)
-		{
-			query = query.Where(p => p.Price <= maxPrice.Value);
-		}
-
-		return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-	}*/
-
-	/*public async Task GetPageProductsAsync(int page, int pageSize,
-		string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
+	public async Task<List<Product>> GetPageProductsAsync(int page, int pageSize, ProductFilter filter)
 	{
 		var query = _dbContext.Products.AsQueryable();
+		query = ApplyFilters(query, filter);
 
-		if (!string.IsNullOrEmpty(brandFilter))
-		{
-			query = query.Where(p => p.Brand.Contains(brandFilter));
-		}
-
-		if (minPrice.HasValue)
-		{
-			query = query.Where(p => p.Price >= minPrice.Value);
-		}
-
-		if (maxPrice.HasValue)
-		{
-			query = query.Where(p => p.Price <= maxPrice.Value);
-		}
-
-		await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-	}*/
+		return await query.Skip((page - 1) * pageSize)
+						  .Take(pageSize)
+						  .ToListAsync();
+	}
 
 	public async Task CreateProductAsync(Product product)
 	{
@@ -111,27 +101,5 @@ public sealed class ProductsRepository : IProductsRepository
 			_dbContext.Products.Remove(productToDelete);
 			await _dbContext.SaveChangesAsync();
 		}
-	}
-
-	public async Task<int> GetTotalProductCountAsync(ProductFilter filter)
-	{
-		var query = _dbContext.Products.AsQueryable();
-
-		if (!string.IsNullOrEmpty(filter.Brand))
-		{
-			query = query.Where(p => p.Brand.Contains(filter.Brand));
-		}
-
-		if (filter.MinPrice.HasValue)
-		{
-			query = query.Where(p => p.Price >= filter.MinPrice.Value);
-		}
-
-		if (filter.MaxPrice.HasValue)
-		{
-			query = query.Where(p => p.Price <= filter.MaxPrice.Value);
-		}
-
-		return await query.CountAsync();
 	}
 }

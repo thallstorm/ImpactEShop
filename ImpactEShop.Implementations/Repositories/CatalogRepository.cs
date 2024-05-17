@@ -89,5 +89,10 @@ namespace ImpactEShop.Implementations.Repositories
 		{
 			throw new NotImplementedException();
 		}
+
+		public Task<List<Product>> GetPageProductsAsync(int page, int pageSize, ProductFilter filter)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

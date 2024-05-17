@@ -7,5 +7,7 @@ using System.Threading.Tasks;
 namespace ImpactEShop.Models.Domain;
 public sealed class Basket
 {
-    public List<Product> Products { get; set; } = new();
+    public List<BasketItem> BasketItems { get; set; } = new();
+
+    public decimal Price => BasketItems.Sum(item => item.Price);
 }

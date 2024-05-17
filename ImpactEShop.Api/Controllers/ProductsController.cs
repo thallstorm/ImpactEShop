@@ -4,6 +4,7 @@ using ImpactEShop.Models.Domain;
 using ImpactEShop.Models.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace ImpactShopExample.Controllers
 {
@@ -43,7 +44,9 @@ namespace ImpactShopExample.Controllers
 			return Ok(responseModel);
 		}
 
-		[HttpGet]
+		//api/products
+
+		[HttpGet(Name = "GetProducts")]
 		public async Task<ActionResult<List<ProductDetailsResponseModel>>> GetProductsAsync()
 		{
 			var products = await _productsRepository.GetProductsAsync();
@@ -62,13 +65,16 @@ namespace ImpactShopExample.Controllers
 			return Ok(responseModels);
 		}
 
-		/*[HttpGet]
+		//api/products/paged or
+		//api/products/paged?page=1&amp;pageSize=10&amp;brandFilter=BrandName&amp;minPrice=100&amp;maxPrice=500
+
+		[HttpGet("paged", Name = "GetPageProducts")] 
 		public async Task<ActionResult<ProductListResponseModel>> GetPageProductsAsync(int page = 1, int pageSize = 10,
 			string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
 		{
 			// Ensure valid page and page size (allow 6, 12, or all)
 			page = Math.Max(page, 1);
-			pageSize = pageSize == int.MaxValue ? int.MaxValue : Math.Clamp(pageSize, 6, 12); 
+			pageSize = pageSize == int.MaxValue ? int.MaxValue : Math.Clamp(pageSize, 6, 12);
 
 			// Apply filtering logic
 			var filter = new ProductFilter
@@ -87,11 +93,12 @@ namespace ImpactShopExample.Controllers
 				CurrentPage = page,
 				PageSize = pageSize,
 				TotalProducts = totalProducts,
-				Products = new List<ProductSummaryResponseModel>() // Empty list for products
+				Products = new List<ProductSummaryResponseModel> () // Empty list for products
+
 			};
 
-			// Retrieve product details for the current page using a separate repository call (optional)
-			*//*var productDetails = await _productsRepository.GetProductsAsync(page, pageSize); // Optional
+			// Retrieve product details for the current page using a separate repository call
+			var productDetails = await _productsRepository.GetPageProductsAsync(page, pageSize, filter);
 
 			// Map product details to ProductSummaryResponseModel objects and add them to the response
 			foreach (var product in productDetails)
@@ -102,13 +109,12 @@ namespace ImpactShopExample.Controllers
 					Name = product.Name,
 					Price = product.Price,
 					Brand = product.Brand
-					//ImageUrl = Your logic to get the image URL for the product (optional)
-
+				//ImageUrl = Your logic to get the image URL for the product (optional)
 				});
-			}*//*
+			}
 
 			return Ok(responseModel);
-		}*/
+		}
 
 		[HttpPost]
 		public async Task<ActionResult<ProductDetailsResponseModel>> CreateProductAsync([FromBody] ProductCreateRequestModel requestModel)
