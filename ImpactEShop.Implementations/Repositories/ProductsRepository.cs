@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ImpactEShop.Abstractions.Repositories;
-public sealed class ProductsRepository : IProductsRepository
+public class ProductsRepository : IProductsRepository
 {
 	private readonly AppDbContext _dbContext;
 

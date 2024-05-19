@@ -9,9 +9,9 @@ namespace ImpactEShop.Abstractions.Repositories
 {
 	public interface IBasketRepository
 	{
-		Task<List<BasketItem>> GetBasketAsync(Guid customerId);
-		Task AddProductToBasketAsync(Guid customerId, Guid productId, int quantity);
-		Task RemoveProductFromBasketAsync(Guid customerId, Guid productId);
-		Task UpdateProductQuantityInBasketAsync(Guid customerId, Guid productId, int newQuantity);
+		Task<Basket> GetBasketByCustomerId(Guid customerId);
+		Task<Basket> AddItemToBasket(Guid customerId, Guid productId, int quantity);
+		Task UpdateBasketItemQuantity(Guid customerId, Guid productId, int quantity);
+		Task<bool> ClearBasketByCustomerId(Guid customerId);
 	}
 }

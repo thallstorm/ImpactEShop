@@ -1,5 +1,7 @@
 ﻿using ImpactEShop.Abstractions.Repositories;
+using ImpactEShop.Models.Data;
 using ImpactEShop.Models.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,75 +12,93 @@ using System.Threading.Tasks;
 namespace ImpactEShop.Implementations.Repositories
 {
 	public class BasketRepository : IBasketRepository
-	{
-		private readonly IDictionary<Guid, List<BasketItem>> _baskets;
-		private readonly IProductsRepository _productsRepository;
+{
+    private readonly AppDbContext _dbcontext;
 
-		public BasketRepository(IDictionary<Guid, List<BasketItem>> baskets, IProductsRepository productsRepository)
-		{
-			_baskets = baskets;
-			_productsRepository = productsRepository;
-		}
+    public BasketRepository(AppDbContext dbcontext)
+    {
+			_dbcontext = dbcontext;
+    }
 
-		public async Task<List<BasketItem>> GetBasketAsync(Guid customerId)
-		{
-			if (!_baskets.ContainsKey(customerId))
-			{
-				_baskets.TryAdd(customerId, new List<BasketItem>());
-			}
+    public async Task<Basket> GetBasketByCustomerId(Guid customerId)
+    {
+        var basket = await _dbcontext.Set<Basket>()
+            .Include(b => b.BasketItems)
+            .ThenInclude(item => item.Product)
+            .FirstOrDefaultAsync(b => b.CustomerId == customerId);
 
-			return _baskets[customerId];
-		}
+        return basket;
+    }
 
-		public async Task AddProductToBasketAsync(Guid customerId, Guid productId, int quantity)
-		{
-			var basket = await GetBasketAsync(customerId);
+    public async Task<Basket> AddItemToBasket(Guid customerId, Guid productId, int quantity)
+    {
+        var basket = await GetBasketByCustomerId(customerId);
+        if (basket == null)
+        {
+            basket = new Basket { CustomerId = customerId };
+            _dbcontext.Add(basket);
+        }
 
-			// Retrieve product details using dependency injected IProductsRepository
-			var product = await _productsRepository.GetProductByIdAsync(productId);
+        var product = await _dbcontext.Set<Product>().FindAsync(productId);
+        if (product == null)
+        {
+            throw new ArgumentException("Invalid product Id");
+        }
 
-			if (product != null && CanAddToBasket(product))
-			{
-				var existingItem = basket.FirstOrDefault(item => item.Product.Id == productId);
-				if (existingItem != null)
-				{
-					existingItem.Quantity += quantity;
-				}
-				else
-				{
-					basket.Add(new BasketItem { Product = product, Quantity = quantity });
-				}
-			}
-		}
+        var basketItem = basket.BasketItems.FirstOrDefault(item => item.ProductId == productId);
+        if (basketItem == null)
+        {
+            basketItem = new BasketItem { ProductId = productId, Quantity = quantity, Product = product };
+            basket.BasketItems.Add(basketItem);
+        }
+        else
+        {
+            basketItem.Quantity += quantity;
+        }
 
-		public async Task RemoveProductFromBasketAsync(Guid customerId, Guid productId)
-		{
-			var basket = await GetBasketAsync(customerId);
-			var itemToRemove = basket.FirstOrDefault(item => item.Product.Id == productId);
-			if (itemToRemove != null)
-			{
-				basket.Remove(itemToRemove);
-			}
-		}
+        await _dbcontext.SaveChangesAsync();
+        return basket;
+    }
 
-		public async Task UpdateProductQuantityInBasketAsync(Guid customerId, Guid productId, int newQuantity)
-		{
-			var basket = await GetBasketAsync(customerId);
-			var itemToUpdate = basket.FirstOrDefault(item => item.Product.Id == productId);
-			if (itemToUpdate != null)
-			{
-				itemToUpdate.Quantity = newQuantity;
-			}
-		}
+    public async Task UpdateBasketItemQuantity(Guid customerId, Guid productId, int quantity)
+    {
+        var basket = await GetBasketByCustomerId(customerId);
+        if (basket == null)
+        {
+            throw new ArgumentException("Basket not found for customer");
+        }
 
-		private bool CanAddToBasket(Product product)
-		{
-			// Implement logic based on product availability rules
-			return product.Stock > 0 && (
-				(product.Status == EShopStatusEnum.One && product.Stock > 0) || // Status 1, any stock
-				(product.Status == EShopStatusEnum.Two && product.Stock > 2) || // Status 2, stock > 2
-				product.Status == EShopStatusEnum.Three // Status 3, regardless of stock
-			);
-		}
-	}
+        var basketItem = basket.BasketItems.FirstOrDefault(item => item.ProductId == productId);
+        if (basketItem == null)
+        {
+            throw new ArgumentException("Product not found in basket");
+  
+        }
+
+        if (quantity <= 0)
+        {
+            basket.BasketItems.Remove(basketItem);
+        }
+        else
+        {
+            basketItem.Quantity = quantity;
+        }
+
+        await _dbcontext.SaveChangesAsync();
+    }
+
+    public async Task<bool> ClearBasketByCustomerId(Guid customerId)
+    {
+        var basket = await GetBasketByCustomerId(customerId);
+        if (basket == null)
+        {
+            return false;
+        }
+
+        _dbcontext.BasketItems.RemoveRange(basket.BasketItems);
+        _dbcontext.Baskets.Remove(basket);
+        await _dbcontext.SaveChangesAsync();
+        return true;
+    }
+}
 }

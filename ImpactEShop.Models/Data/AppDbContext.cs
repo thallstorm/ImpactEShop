@@ -15,19 +15,18 @@ namespace ImpactEShop.Models.Data
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
 		}
-	/*	protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Basket>().HasNoKey();
-		}*/
+		}
 
 		//Tables
 		public DbSet<Product> Products { get; set; }
 		public DbSet<Customer> Customers { get; set; }
 		public DbSet<Order> Orders { get; set; }
 		public DbSet<Service> Services { get; set; }
-
-		/* public DbSet<Basket> Baskets { get; set; } */
-		/* public DbSet<EShopStatus> EshopStatuses { get; set; } */
+		public DbSet<BasketItem> BasketItems { get; set; }
+		public DbSet<Basket> Baskets { get; set; }
+/*		public DbSet<EShopStatusEnum> EShopStatusEnum { get; set; }*/
 
 	}
 }

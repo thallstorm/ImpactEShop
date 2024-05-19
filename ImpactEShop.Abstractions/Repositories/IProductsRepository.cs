@@ -1,4 +1,5 @@
-﻿using ImpactEShop.Models.Domain;
+﻿using ImpactEShop.Models.Data;
+using ImpactEShop.Models.Domain;
 using ImpactEShop.Models.Dto;
 using System;
 using System.Collections.Generic;
