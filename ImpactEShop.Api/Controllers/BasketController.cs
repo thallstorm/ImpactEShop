@@ -1,4 +1,5 @@
 ﻿using ImpactEShop.Abstractions.Repositories;
+using ImpactEShop.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ImpactEShop.Api.Controllers
@@ -16,12 +17,12 @@ namespace ImpactEShop.Api.Controllers
 		[Route("api/basket/{customerId}")]
 		public async Task<IActionResult> GetBasketByCustomerId(Guid customerId)
 		{
-			var basket = await _basketRepository.GetBasketByCustomerId(customerId);
-			if (basket == null)
+			var basketDetails = await _basketRepository.GetBasketByCustomerId(customerId);
+			if (basketDetails == null)
 			{
 				return NotFound();
 			}
-			return Ok(basket);
+			return Ok(basketDetails);
 		}
 
 		[HttpPost]

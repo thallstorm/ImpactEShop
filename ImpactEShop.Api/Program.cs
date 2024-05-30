@@ -1,10 +1,12 @@
 using ImpactEShop.Abstractions.Repositories;
 using ImpactEShop.Implementations.Repositories;
 using ImpactEShop.Models.Data;
+using ImpactEShop.Api.Configuration;
 using ImpactEShop.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Concurrent;
+using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+// Register Mapster configuration
+MapsterConfiguration.Configure();
 
 var app = builder.Build();
 

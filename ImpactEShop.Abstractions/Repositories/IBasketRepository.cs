@@ -1,4 +1,5 @@
 ﻿using ImpactEShop.Models.Domain;
+using ImpactEShop.Models.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace ImpactEShop.Abstractions.Repositories
 {
 	public interface IBasketRepository
 	{
-		Task<Basket> GetBasketByCustomerId(Guid customerId);
-		Task<Basket> AddItemToBasket(Guid customerId, Guid productId, int quantity);
+		Task<BasketDetailsResponseModel> GetBasketByCustomerId(Guid customerId);
+		Task<BasketDetailsResponseModel> AddItemToBasket(Guid customerId, Guid productId, int quantity);
 		Task UpdateBasketItemQuantity(Guid customerId, Guid productId, int quantity);
 		Task<bool> ClearBasketByCustomerId(Guid customerId);
 	}
