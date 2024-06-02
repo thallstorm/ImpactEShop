@@ -18,16 +18,4 @@ public interface IProductsRepository
 
 	Task<int> GetTotalProductCountAsync(ProductFilter filter);
 	Task<List<Product>> GetPageProductsAsync(int page, int pageSize, ProductFilter filter); // Add filter parameter
-
-}
-
-public record ModifyProductInfo
-{
-    public required string Name { get; set; }
-    public required string Description { get; set; }
-    public required decimal Price { get; set; }
-    public string? Brand { get; set; }
-    public decimal? DiscountedPrice { get; set; }
-    public required int Stock { get; set; }
-    public required EShopStatusEnum Status { get; set; }
 }

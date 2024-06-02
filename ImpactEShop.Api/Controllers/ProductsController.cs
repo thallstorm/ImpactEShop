@@ -47,56 +47,6 @@ namespace ImpactShopExample.Controllers
 			return Ok(responseModels);
 		}
 
-		//api/products/paged or
-		//api/products/paged?page=1&amp;pageSize=10&amp;brandFilter=BrandName&amp;minPrice=100&amp;maxPrice=500
-		[HttpGet("paged", Name = "GetPageProducts")] 
-		public async Task<ActionResult<ProductListResponseModel>> GetPageProductsAsync(int page = 1, int pageSize = 10,
-			string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
-		{
-			// Ensure valid page and page size (allow 6, 12, or all)
-			page = Math.Max(page, 1);
-			pageSize = pageSize == int.MaxValue ? int.MaxValue : Math.Clamp(pageSize, 6, 12);
-
-			// Apply filtering logic
-			var filter = new ProductFilter
-			{
-				Brand = brandFilter,
-				MinPrice = minPrice,
-				MaxPrice = maxPrice
-			};
-
-			// Call repository to get total product count based on filters
-			var totalProducts = await _productsRepository.GetTotalProductCountAsync(filter);
-
-			// Create and return the response model with pagination information
-			var responseModel = new ProductListResponseModel
-			{
-				CurrentPage = page,
-				PageSize = pageSize,
-				TotalProducts = totalProducts,
-				Products = new List<ProductSummaryResponseModel> () // Empty list for products
-
-			};
-
-			// Retrieve product details for the current page using a separate repository call
-			var productDetails = await _productsRepository.GetPageProductsAsync(page, pageSize, filter);
-
-			// Map product details to ProductSummaryResponseModel objects and add them to the response
-			foreach (var product in productDetails)
-			{
-				responseModel.Products.Add(new ProductSummaryResponseModel
-				{
-					Id = product.Id,
-					Name = product.Name,
-					Price = product.Price,
-					Brand = product.Brand
-				//ImageUrl = Your logic to get the image URL for the product (optional)
-				});
-			}
-
-			return Ok(responseModel);
-		}
-
 		[HttpPost]
 		public async Task<ActionResult<ProductDetailsResponseModel>> CreateProductAsync([FromBody] ProductCreateRequestModel requestModel)
 		{
@@ -157,6 +107,56 @@ namespace ImpactShopExample.Controllers
 
 			await _productsRepository.DeleteProductAsync(productId);
 			return NoContent();
+		}
+
+		//api/products/paged or
+		//api/products/paged?page=1&amp;pageSize=10&amp;brandFilter=BrandName&amp;minPrice=100&amp;maxPrice=500
+		[HttpGet("paged", Name = "GetPageProducts")]
+		public async Task<ActionResult<ProductListResponseModel>> GetPageProductsAsync(int page = 1, int pageSize = 10,
+			string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
+		{
+			// Ensure valid page and page size (allow 6, 12, or all)
+			page = Math.Max(page, 1);
+			pageSize = pageSize == int.MaxValue ? int.MaxValue : Math.Clamp(pageSize, 6, 12);
+
+			// Apply filtering logic
+			var filter = new ProductFilter
+			{
+				Brand = brandFilter,
+				MinPrice = minPrice,
+				MaxPrice = maxPrice
+			};
+
+			// Call repository to get total product count based on filters
+			var totalProducts = await _productsRepository.GetTotalProductCountAsync(filter);
+
+			// Create and return the response model with pagination information
+			var responseModel = new ProductListResponseModel
+			{
+				CurrentPage = page,
+				PageSize = pageSize,
+				TotalProducts = totalProducts,
+				Products = new List<ProductSummaryResponseModel>() // Empty list for products
+
+			};
+
+			// Retrieve product details for the current page using a separate repository call
+			var productDetails = await _productsRepository.GetPageProductsAsync(page, pageSize, filter);
+
+			// Map product details to ProductSummaryResponseModel objects and add them to the response
+			foreach (var product in productDetails)
+			{
+				responseModel.Products.Add(new ProductSummaryResponseModel
+				{
+					Id = product.Id,
+					Name = product.Name,
+					Price = product.Price,
+					Brand = product.Brand
+					//ImageUrl = Your logic to get the image URL for the product (optional)
+				});
+			}
+
+			return Ok(responseModel);
 		}
 	}
 }

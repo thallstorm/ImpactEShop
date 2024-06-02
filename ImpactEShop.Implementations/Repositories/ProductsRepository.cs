@@ -29,43 +29,6 @@ public class ProductsRepository : IProductsRepository
 		return await _dbContext.Products.ToListAsync();
 	}
 
-	private IQueryable<Product> ApplyFilters(IQueryable<Product> query, ProductFilter filter)
-    {
-        if (!string.IsNullOrEmpty(filter.Brand))
-        {
-            query = query.Where(p => p.Brand == filter.Brand);
-        }
-
-        if (filter.MinPrice.HasValue)
-        {
-            query = query.Where(p => p.Price >= filter.MinPrice.Value);
-        }
-
-        if (filter.MaxPrice.HasValue)
-        {
-            query = query.Where(p => p.Price <= filter.MaxPrice.Value);
-        }
-
-        return query;
-    }
-	public async Task<int> GetTotalProductCountAsync(ProductFilter filter)
-	{
-		var query = _dbContext.Products.AsQueryable();
-		query = ApplyFilters(query, filter);
-
-		return await query.CountAsync();
-	}
-
-	public async Task<List<Product>> GetPageProductsAsync(int page, int pageSize, ProductFilter filter)
-	{
-		var query = _dbContext.Products.AsQueryable();
-		query = ApplyFilters(query, filter);
-
-		return await query.Skip((page - 1) * pageSize)
-						  .Take(pageSize)
-						  .ToListAsync();
-	}
-
 	public async Task CreateProductAsync(Product product)
 	{
 		_dbContext.Products.Add(product);
@@ -87,4 +50,40 @@ public class ProductsRepository : IProductsRepository
             await _dbContext.SaveChangesAsync();
         }
     }
+	private IQueryable<Product> ApplyFilters(IQueryable<Product> query, ProductFilter filter)
+	{
+		if (!string.IsNullOrEmpty(filter.Brand))
+		{
+			query = query.Where(p => p.Brand == filter.Brand);
+		}
+
+		if (filter.MinPrice.HasValue)
+		{
+			query = query.Where(p => p.Price >= filter.MinPrice.Value);
+		}
+
+		if (filter.MaxPrice.HasValue)
+		{
+			query = query.Where(p => p.Price <= filter.MaxPrice.Value);
+		}
+
+		return query;
+	}
+	public async Task<int> GetTotalProductCountAsync(ProductFilter filter)
+	{
+		var query = _dbContext.Products.AsQueryable();
+		query = ApplyFilters(query, filter);
+
+		return await query.CountAsync();
+	}
+
+	public async Task<List<Product>> GetPageProductsAsync(int page, int pageSize, ProductFilter filter)
+	{
+		var query = _dbContext.Products.AsQueryable();
+		query = ApplyFilters(query, filter);
+
+		return await query.Skip((page - 1) * pageSize)
+						  .Take(pageSize)
+						  .ToListAsync();
+	}
 }
