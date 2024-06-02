@@ -19,8 +19,8 @@ namespace ImpactEShop.Api.Controllers
 		}
 
 		[HttpGet("{customerId}")]
-		public async Task<ActionResult<CustomerDetailsResponseModel>> GetCustomerByIdAsync(Guid customerId)
-		{
+		public async Task<ActionResult<CustomerDetailsResponseModel>> GetCustomerByIdAsync(Guid customerId) //Async method that returns an ActionResult<T> type Obj
+		{																				//ActionResult<T> class (inherits from IActionResult) is more specific, enforcing consistent data model
 			var customer = await _customerRepository.GetCustomerByIdAsync(customerId);
 			if (customer == null)
 			{

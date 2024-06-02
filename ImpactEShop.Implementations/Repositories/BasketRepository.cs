@@ -13,23 +13,23 @@ using System.Threading.Tasks;
 
 namespace ImpactEShop.Implementations.Repositories
 {
-	public class BasketRepository : IBasketRepository
-	{
+	public class BasketRepository : IBasketRepository	 //Defines class that implements the IBasketRepository interface.
+	{													 //This repository is responsible for accessing and managing basket data.
 		private readonly AppDbContext _dbcontext;
 
-		public BasketRepository(AppDbContext dbcontext)
-		{
+		public BasketRepository(AppDbContext dbcontext) //Constructor has a private readonly field named _dbcontext of type AppDbContext.
+		{												//This injects a dependency on the application database context, responsible for interacting with the Database.
 			_dbcontext = dbcontext;
 		}
 
 		public async Task<BasketDetailsResponseModel> GetBasketByCustomerId(Guid customerId)
 		{
-			var basket = await _dbcontext.Set<Basket>()
-				.Include(b => b.BasketItems)
-				.ThenInclude(item => item.Product)
-				.FirstOrDefaultAsync(b => b.CustomerId == customerId);
+			var basket = await _dbcontext.Set<Basket>() //.Set<Basket>() tells the context to access the DbSet for the Basket entity type. This allows querying baskets from database.
+				.Include(b => b.BasketItems)			//Include method for eager loading. Data retrieval in ORM frameworks. The query will also retrieve the associated basket items in a single db call.
+				.ThenInclude(item => item.Product)		//For each retrieved BasketItem, the Product navigation property should also be included
+				.FirstOrDefaultAsync(b => b.CustomerId == customerId); //Filters the retrieved baskets based on CustomerId parameter. Finds the first basket where the CustomerId matches and returns Basket Obj
 
-			return basket?.Adapt<BasketDetailsResponseModel>();
+			return basket?.Adapt<BasketDetailsResponseModel>(); //Checks if basket is not null and maps basket to dto.
 		}
 
 		public async Task<BasketDetailsResponseModel> AddItemToBasket(Guid customerId, Guid productId, int quantity)

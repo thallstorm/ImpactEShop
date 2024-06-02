@@ -2,6 +2,7 @@
 using ImpactEShop.Implementations.Repositories;
 using ImpactEShop.Models.Domain;
 using ImpactEShop.Models.Dto;
+using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -28,46 +29,26 @@ namespace ImpactShopExample.Controllers
 				return NotFound();
 			}
 
-			// Map product data to response model
-			var responseModel = new ProductDetailsResponseModel
-			{
-				Id = product.Id,
-				Name = product.Name,
-				Description = product.Description,
-				Price = product.Price,
-				Brand = product.Brand,
-				DiscountedPrice = product.DiscountedPrice,
-				Stock = product.Stock,
-				Status = product.Status
-			};
+			// Map product data to response model using Mapster
+			var responseModel = product.Adapt<ProductDetailsResponseModel>();
 
 			return Ok(responseModel);
 		}
 
 		//api/products
-
 		[HttpGet(Name = "GetProducts")]
 		public async Task<ActionResult<List<ProductDetailsResponseModel>>> GetProductsAsync()
 		{
 			var products = await _productsRepository.GetProductsAsync();
-			var responseModels = products.Select(product => new ProductDetailsResponseModel
-			{
-				Id = product.Id,
-				Name = product.Name,
-				Description = product.Description,
-				Price = product.Price,
-				Brand = product.Brand,
-				DiscountedPrice = product.DiscountedPrice,
-				Stock = product.Stock,
-				Status = product.Status
-			}).ToList();
+
+			// Map product data to response models using Mapster
+			var responseModels = products.Adapt<List<ProductDetailsResponseModel>>();
 
 			return Ok(responseModels);
 		}
 
 		//api/products/paged or
 		//api/products/paged?page=1&amp;pageSize=10&amp;brandFilter=BrandName&amp;minPrice=100&amp;maxPrice=500
-
 		[HttpGet("paged", Name = "GetPageProducts")] 
 		public async Task<ActionResult<ProductListResponseModel>> GetPageProductsAsync(int page = 1, int pageSize = 10,
 			string brandFilter = null, decimal? minPrice = null, decimal? maxPrice = null)
@@ -124,40 +105,19 @@ namespace ImpactShopExample.Controllers
 				return BadRequest(ModelState);
 			}
 
-			// Map request model data to product object
-			var product = new Product
-			{
-				Id = requestModel.Id,
-				Name = requestModel.Name,
-				Description = requestModel.Description,
-				Price = requestModel.Price,
-				Brand = requestModel.Brand,
-				DiscountedPrice = requestModel.DiscountedPrice,
-				Stock = requestModel.Stock,
-				Status = requestModel.Status
-			};
+			// Map request model data to product object using Mapster
+			var product = requestModel.Adapt<Product>();
 
 			await _productsRepository.CreateProductAsync(product);
 
-			// Map created product data to response model
-			var responseModel = new ProductDetailsResponseModel
-			{
-				Id = product.Id,
-				Name = product.Name,
-				Description = product.Description,
-				Price = product.Price,
-				Brand = product.Brand,
-				DiscountedPrice = product.DiscountedPrice,
-				Stock = product.Stock,
-				Status = product.Status
-			};
+			// Map created product data to response model using Mapster
+			var responseModel = product.Adapt<ProductDetailsResponseModel>();
 
 			return Ok(responseModel);
 		}
 
 		[HttpPut("{productId}")]
-
-		public async Task<ActionResult<ProductCreateRequestModel>> UpdateProductAsync(Guid productId, [FromBody] ProductCreateRequestModel requestModel)
+		public async Task<ActionResult<ProductDetailsResponseModel>> UpdateProductAsync(Guid productId, [FromBody] ProductCreateRequestModel requestModel)
 		{
 			if (requestModel == null)
 			{
@@ -175,31 +135,15 @@ namespace ImpactShopExample.Controllers
 				return NotFound();
 			}
 
-			product.Id = requestModel.Id;
-			product.Name = requestModel.Name;
-			product.Description = requestModel.Description;
-			product.Price = requestModel.Price;
-			product.Brand = requestModel.Brand;
-			product.DiscountedPrice = requestModel.DiscountedPrice;
-			product.Stock = requestModel.Stock;
-			product.Status = requestModel.Status;
+			// Map request model data to existing product object using Mapster
+			requestModel.Adapt(product);
 
 			await _productsRepository.UpdateProductAsync(product);
 
-			var responseModel = new ProductDetailsResponseModel
-			{
-				Id = product.Id,
-				Name = product.Name,
-				Description = product.Description,
-				Price = product.Price,
-				Brand = product.Brand,
-				DiscountedPrice = product.DiscountedPrice,
-				Stock = product.Stock,
-				Status = product.Status
-			};
+			// Map updated product data to response model using Mapster
+			var responseModel = product.Adapt<ProductDetailsResponseModel>();
 
 			return Ok(responseModel);
-
 		}
 
 		// Implement UpdateProductAsync and DeleteProductAsync methods

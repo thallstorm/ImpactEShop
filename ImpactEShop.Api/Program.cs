@@ -23,8 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 });
 
-// Register services with dependency injection
-builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
+// Register services with dependency injection, setting up dependency injection
+builder.Services.AddTransient<IProductsRepository, ProductsRepository>(); //Creates a new instance of the service every time it's requested
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
