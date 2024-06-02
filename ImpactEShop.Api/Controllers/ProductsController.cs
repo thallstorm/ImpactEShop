@@ -146,7 +146,17 @@ namespace ImpactShopExample.Controllers
 			return Ok(responseModel);
 		}
 
-		// Implement UpdateProductAsync and DeleteProductAsync methods
-		// using ProductUpdateRequestModel (optional) and appropriate response models
+		[HttpDelete("{productId}")]
+		public async Task<IActionResult> DeleteProductAsync(Guid productId)
+		{
+			var product = await _productsRepository.GetProductByIdAsync(productId);
+			if (product == null)
+			{
+				return NotFound();
+			}
+
+			await _productsRepository.DeleteProductAsync(productId);
+			return NoContent();
+		}
 	}
 }

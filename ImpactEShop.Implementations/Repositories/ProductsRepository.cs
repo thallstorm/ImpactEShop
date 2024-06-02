@@ -78,28 +78,13 @@ public class ProductsRepository : IProductsRepository
 		await _dbContext.SaveChangesAsync();
 	}
 
-	/*public async Task DeleteProductAsync(Guid id)
-	{
-		var productToDelete = await _dbContext.Products.FindAsync(id);
-		if (productToDelete != null)
-		{
-			_dbContext.Products.Remove(productToDelete);
-			await _dbContext.SaveChangesAsync();
-		}
-	}*/
-
-	public async Task DeleteProductAsync(Guid id)
-	{
-		if (id == Guid.Empty)
-		{
-			throw new ArgumentException("Invalid product id");
-		}
-
-		var productToDelete = await _dbContext.Products.FindAsync(id);
-		if (productToDelete != null)
-		{
-			_dbContext.Products.Remove(productToDelete);
-			await _dbContext.SaveChangesAsync();
-		}
-	}
+	public async Task DeleteProductAsync(Guid productId)
+    {
+        var product = await GetProductByIdAsync(productId);
+        if (product != null)
+        {
+            _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync();
+        }
+    }
 }
