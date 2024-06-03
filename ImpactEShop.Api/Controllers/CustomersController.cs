@@ -4,6 +4,7 @@ using ImpactEShop.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using ImpactEShop.Abstractions.Repositories;
 using ImpactEShop.Models.Domain;
+using Mapster;
 
 namespace ImpactEShop.Api.Controllers
 {
@@ -27,54 +28,27 @@ namespace ImpactEShop.Api.Controllers
 				return NotFound();
 			}
 
-			// Map customer data to response model
-			var responseModel = new CustomerDetailsResponseModel
-			{
-				Id = customer.Id,
-				FirstName = customer.FirstName,
-				LastName = customer.LastName,
-				PhoneNumber = customer.PhoneNumber,
-				Address = customer.Address,
-				PostalCode = customer.PostalCode,
-				Email = customer.Email
-			};
+			// Map customer data to response model using Mapster
+			var responseModel = customer.Adapt<CustomerDetailsResponseModel>();
 
 			return Ok(responseModel);
 		}
 
 		[HttpPost]
-		public async Task<ActionResult<CustomerDetailsResponseModel>> CreateCustomerAsync([FromBody] CustomerCreateRequestModel newCustomerRequestModel)
+		public async Task<ActionResult<CustomerDetailsResponseModel>> CreateCustomerAsync([FromBody] CustomerCreateRequestModel requestModel)
 		{
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
 
-			// Map request model data to customer object
-			var customer = new Customer
-			{
-				Id = newCustomerRequestModel.Id,
-				Email = newCustomerRequestModel.Email,
-				FirstName = newCustomerRequestModel.FirstName,
-				LastName = newCustomerRequestModel.LastName,
-				PhoneNumber = newCustomerRequestModel.PhoneNumber,
-				Address = newCustomerRequestModel.Address,
-				PostalCode = newCustomerRequestModel.PostalCode
-			};
+			// Map request model data to customer object using Mapster
+			var customer = requestModel.Adapt<Customer>();
 
 			await _customerRepository.CreateCustomerAsync(customer);
 
-			// Map created customer data to response model
-			var responseModel = new CustomerDetailsResponseModel
-			{
-				Id = customer.Id,
-				FirstName = customer.FirstName,
-				LastName = customer.LastName,
-				Email = customer.Email,
-				PhoneNumber = customer.PhoneNumber,
-				Address = customer.Address,
-				PostalCode = customer.PostalCode
-			};
+			// Map created customer data to response model using Mapster
+			var responseModel = customer.Adapt<CustomerDetailsResponseModel>();
 
 			return Ok(responseModel);
 		}
@@ -83,16 +57,9 @@ namespace ImpactEShop.Api.Controllers
 		public async Task<ActionResult<List<CustomerDetailsResponseModel>>> GetCustomersAsync()
 		{
 			var customers = await _customerRepository.GetCustomersAsync();
-			var responseModels = customers.Select(c => new CustomerDetailsResponseModel
-			{
-				Id = c.Id,
-				FirstName = c.FirstName,
-				LastName = c.LastName,
-				Email = c.Email,
-				PhoneNumber = c.PhoneNumber,
-				Address = c.Address,
-				PostalCode = c.PostalCode
-			}).ToList();
+
+			var responseModels = customers.Adapt<List<CustomerDetailsResponseModel>>();
+
 
 			return Ok(responseModels);
 		}
@@ -116,25 +83,13 @@ namespace ImpactEShop.Api.Controllers
 				return NotFound();
 			}
 
-			customer.FirstName = requestModel.FirstName;
-			customer.LastName = requestModel.LastName;
-			customer.Email = requestModel.Email;
-			customer.PhoneNumber = requestModel.PhoneNumber;
-			customer.Address = requestModel.Address;
-			customer.PostalCode = requestModel.PostalCode;
+			// Map request model data to existing customer object using Mapster
+			requestModel.Adapt(customer);
 
 			await _customerRepository.UpdateCustomerAsync(customer);
 
-			var responseModel = new CustomerDetailsResponseModel
-			{
-				Id = customer.Id,
-				FirstName = customer.FirstName,
-				LastName = customer.LastName,
-				Email = customer.Email,
-				PhoneNumber = customer.PhoneNumber,
-				Address = customer.Address,
-				PostalCode = customer.PostalCode
-			};
+			// Map updated customer data to response model using Mapster
+			var responseModel = customer.Adapt<CustomerDetailsResponseModel>();
 
 			return Ok(responseModel);
 		}
@@ -142,6 +97,12 @@ namespace ImpactEShop.Api.Controllers
 		[HttpDelete("{customerId}")]
 		public async Task<IActionResult> DeleteCustomerAsync(Guid customerId)
 		{
+			var customer = await _customerRepository.GetCustomerByIdAsync(customerId);
+			if (customer == null)
+			{
+				return NotFound();
+			}
+
 			await _customerRepository.DeleteCustomerAsync(customerId);
 
 			return NoContent(); // Customer deleted successfully (no content to return)

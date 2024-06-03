@@ -8,7 +8,6 @@ namespace ImpactEShop.Models.Dto;
 
 public sealed record CustomerCreateRequestModel
 {
-	public required Guid Id { get; init; }
 	public required string FirstName { get; init; }
 	public required string LastName { get; init; }
 	public required string Email { get; init; }
