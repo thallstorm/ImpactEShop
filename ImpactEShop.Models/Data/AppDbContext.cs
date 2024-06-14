@@ -24,6 +24,7 @@ namespace ImpactEShop.Models.Data
 																//This Products Property provides access to the Products table data through methods like Add, Find, allowing CRUD operations on Product data.
 		public DbSet<Customer> Customers { get; set; }
 		public DbSet<Order> Orders { get; set; }
+		public DbSet<OrderItem> OrderItems { get; set; }
 		public DbSet<Service> Services { get; set; }
 		public DbSet<BasketItem> BasketItems { get; set; }
 		public DbSet<Basket> Baskets { get; set; }

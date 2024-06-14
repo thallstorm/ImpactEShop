@@ -1,4 +1,5 @@
 ﻿using ImpactEShop.Models.Domain;
+using ImpactEShop.Models.Dto.Order;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace ImpactEShop.Abstractions.Repositories
 {
 	public interface IOrderRepository
 	{
-		Task<Order> CreateOrderAsync(Order order);
-		Task<List<Order>> GetOrdersByCustomerIdAsync(Guid customerId);
-
+		Task<OrderDetailsResponseModel> SubmitOrder(OrderCreateRequestModel orderRequest);
+		Task<OrderDetailsResponseModel> GetOrderById(Guid orderId);
+		Task<bool> DeleteOrder(Guid orderId);
 	}
 }

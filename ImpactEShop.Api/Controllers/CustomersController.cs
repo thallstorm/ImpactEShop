@@ -1,14 +1,14 @@
-﻿using ImpactEShop.Models.Dto;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using ImpactEShop.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using ImpactEShop.Abstractions.Repositories;
 using ImpactEShop.Models.Domain;
 using Mapster;
+using ImpactEShop.Models.Dto.Customer;
 
 namespace ImpactEShop.Api.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class CustomerController : ControllerBase
 	{

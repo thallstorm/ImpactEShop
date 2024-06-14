@@ -2,6 +2,7 @@
 using ImpactEShop.Implementations.Repositories;
 using ImpactEShop.Models.Domain;
 using ImpactEShop.Models.Dto;
+using ImpactEShop.Models.Dto.Product;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ using System.Collections.Generic;
 
 namespace ImpactShopExample.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class ProductsController : ControllerBase
 	{

@@ -1,6 +1,8 @@
 ﻿using ImpactEShop.Abstractions.Repositories;
 using ImpactEShop.Models.Data;
 using ImpactEShop.Models.Domain;
+using ImpactEShop.Models.Dto.Order;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,17 +21,47 @@ namespace ImpactEShop.Implementations.Repositories
 			_dbContext = dbContext;
 		}
 
-		public async Task<Order> CreateOrderAsync(Order order)
+		public async Task<OrderDetailsResponseModel> SubmitOrder(OrderCreateRequestModel orderRequest)
 		{
+			var order = orderRequest.Adapt<Order>();
+			order.Id = Guid.NewGuid();
+			order.OrderDate = DateTime.UtcNow;
+
 			_dbContext.Orders.Add(order);
 			await _dbContext.SaveChangesAsync();
-			return order;
+
+			return order.Adapt<OrderDetailsResponseModel>();
 		}
 
-		public async Task<List<Order>> GetOrdersByCustomerIdAsync(Guid customerId)
+		public async Task<OrderDetailsResponseModel> GetOrderById(Guid orderId)
 		{
-			return await _dbContext.Orders.Where(o => o.CustomerId == customerId).ToListAsync();
-		}
+			var order = await _dbContext.Orders
+				.Include(o => o.OrderItems)
+				.FirstOrDefaultAsync(o => o.Id == orderId);
 
+			if (order == null)
+			{
+				return null;
+			}
+
+			return order.Adapt<OrderDetailsResponseModel>();
+		}
+		public async Task<bool> DeleteOrder(Guid orderId)
+		{
+			var order = await _dbContext.Orders
+				.Include(o => o.OrderItems)
+				.FirstOrDefaultAsync(o => o.Id == orderId);
+
+			if (order == null)
+			{
+				return false;
+			}
+
+			_dbContext.OrderItems.RemoveRange(order.OrderItems);
+			_dbContext.Orders.Remove(order);
+			await _dbContext.SaveChangesAsync();
+
+			return true;
+		}
 	}
 }
